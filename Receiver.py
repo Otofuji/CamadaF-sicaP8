@@ -3,7 +3,7 @@
 #####################################################
 # Camada Física da Computação
 # Professor Rodrigo Carareto
-# Projeto DTMF
+# Projeto DTMF 
 # Alessandra Blucher e Eric Otofuji
 # Insper Instituto de Ensino e Pesquisa
 # Engenharia de Computação
@@ -13,9 +13,9 @@
 ####################################################
 # OBJETIVOS:
 
-# 7. Demodule o audio.
-# 8. Execute o áudio do audio demodulado.
-# 9. Mostre o gráfico no domínio do tempo e frequência do audio captado e do audio demodulado.
+# 7. Demodule o sinal.
+# 8. Execute o áudio do sinal demodulado.
+# 9. Mostre o gráfico no domínio do tempo e frequência do sinal captado e do sinal demodulado.
 
 ####################################################
 # AVALIAÇÃO:
@@ -35,8 +35,9 @@ import time
 import peakutils
 import matplotlib.pyplot as plt
 from scipy.fftpack import fft
-from scipy import signal
-from signalTeste import signalMeu
+from scipy import signal as window
+from scipy.signal import butter, lfilter
+from scipy.signal import freqs
 
 ####################################################
 #SignalClass
@@ -45,6 +46,7 @@ def generateSin(freq, amplitude, time, fs):
     x = np.linspace(0.0, time, n)
     s = amplitude*np.sin(freq*x*2*np.pi)
     return (x, s)
+
 
 
 def calcFFT(signal, fs):
@@ -56,6 +58,7 @@ def calcFFT(signal, fs):
     return(xf, np.abs(yf[0:N//2]))
 
 
+
 def plotFFT(signal, fs):
     x,y = calcFFT(signal, fs)
     plt.figure()
@@ -64,38 +67,53 @@ def plotFFT(signal, fs):
     plt.show()
 
 
+
 ####################################################
 
-fs= 44100
-duration = 10
-freq = 12000
-audio = signalMeu()
 
-def grava (duration, fs):
-	print("Gravando. . . ")
-	myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=2)
-	sd.wait()
+gravado = sd.rec(15*44100)
+sd.wait()
 
-	print(len(myrecording))
-	print(myrecording)
-	return myrecording[:,0]
+sf.write("demodulado.wav",gravado,44100)
 
+x , portadora = generateSin(12000,1, 15, 44100)
 
-def demodula (dados, freq, fs, duration):
-	s, portadora = generateSin(freq,1, duration,fs)
-	demodulate = np.multiply(portadora,data)
-	return demodulate
+localValue = []
+listPronta = []
 
-def filtro(dados,samplerate,cutoff_hz = 2000.0):
-	nyq_rate = samplerate/2
-	width = 5.0/nyq_rate
-	ripple_db = 60.0 #dB
-	N , beta = signal.kaiserord(ripple_db, width)
-	taps = signal.firwin(N, cutoff_hz/nyq_rate, window=('kaiser', beta))
-	filterted_y = signal.lfilter(taps, 1.0, dados)
-	return filterted_y
+for i in range(0,len(x)):
+    localValue = portadora[i]*gravado.T[0][i]
+
+    listPronta.append(localValue)
 
 
-gravado = grava(duration,fs)
-demodulada = demodula(gravado,freq,fs,duration)
-pronta = filtro(demodulada,fs,4000)
+
+def butter_lowpass(cutOff, fs, order=5):
+    nyq = 0.5 * fs
+    normalCutoff = cutOff / nyq
+    b, a = butter(order, normalCutoff, btype='low', analog = False)
+    return b, a
+
+def butter_lowpass_filter(data, cutOff, fs, order=5):
+    b, a = butter_lowpass(cutOff, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
+filtro = butter_lowpass_filter(listPronta, 2000, 44100)
+
+sd.play(filtro, 44100); sd.wait()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
