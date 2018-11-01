@@ -79,7 +79,7 @@ def plotFFT(signal, fs):
 
 
 audio, samplerate = sf.read("183_loop1_new-summits_0016.wav")
-#plt.plot(audio.T[0]); plt.title("Original"); plt.figure(); 
+plt.plot(audio.T[0]); plt.title("Original"); plt.figure(); 
 audio = audio.T[0]
 audio /= np.max(np.abs(audio),axis=0)
 plt.plot(audio); plt.title("Normalizado"); plt.figure(); 
@@ -97,7 +97,7 @@ def butter_lowpass(cutOff, fs, order=5):
 
 def butter_lowpass_filter(data, cutOff, fs, order=5):
     b, a = butter_lowpass(cutOff, fs, order=order)
-    print("1")
+
     y = lfilter(b, a, data)
     return y
 
@@ -105,10 +105,10 @@ filtrado = butter_lowpass_filter(audio,4000,44100)
 plt.plot(filtrado); plt.title("Filtrado"); plt.figure();
 #print(filtrado)
 
-x , portadora = generateSin(12000,1, 15, 44100)
-plt.plot(portadora.T); plt.title("Portadora"); plt.figure()
 
-#cararetoAM = np.zeros(len(audio))
+x, portadora = generateSin(12000, 1, 0.1, 44100)
+plt.plot(portadora); plt.title("Portadora"); plt.figure();
+x, portadora = generateSin(12000, 1, 15, 44100)
 
 listPronta = []
 for i in range(0,len(x)):
@@ -116,7 +116,7 @@ for i in range(0,len(x)):
 
     listPronta.append(localValue)
 
-plt.plot(localValue)
+plt.plot(listPronta)
 plt.title("Transportada Final")
 
 plt.show()

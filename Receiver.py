@@ -76,7 +76,7 @@ sd.wait()
 
 sf.write("demodulado.wav",gravado,44100)
 
-x , portadora = generateSin(12000,1, 15, 44100)
+x, portadora = generateSin(12000,1, 15, 44100)
 
 localValue = []
 listPronta = []
@@ -103,6 +103,8 @@ filtro = butter_lowpass_filter(listPronta, 2000, 44100)
 
 sd.play(filtro, 44100); sd.wait()
 
+plt.plot(gravado.T[0]); plt.title("Original"); plt.figure(); 
+plt.plot(filtro); plt.title("Demodulado"); plt.figure(); plt.show();
 
 
 
