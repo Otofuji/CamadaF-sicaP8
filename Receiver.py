@@ -61,10 +61,8 @@ def calcFFT(signal, fs):
 
 def plotFFT(signal, fs):
     x,y = calcFFT(signal, fs)
-    plt.figure()
     plt.plot(x, np.abs(y))
-    plt.title('Fourier')
-    plt.show()
+    plt.figure();
 
 
 
@@ -104,7 +102,10 @@ filtro = butter_lowpass_filter(listPronta, 2000, 44100)
 sd.play(filtro, 44100); sd.wait()
 
 plt.plot(gravado.T[0]); plt.title("Original"); plt.figure(); 
-plt.plot(filtro); plt.title("Demodulado"); plt.figure(); plt.show();
+plotFFT(gravado.T[0], 44100); plt.title("Original-Frequência");
+plt.plot(filtro); plt.title("Demodulado"); plt.figure(); 
+plotFFT(filtro, 44100); plt.title("Demodulado-Frequência");
+plt.show(); 
 
 
 
